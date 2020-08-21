@@ -58,11 +58,16 @@ def save_48_data(data, s1, s2, s3, b1, b2, b3,
 	b2_avg_list += [sum(data[ss * 4: ss * 5]) / 5]
 	b3_avg_list += [sum(data[ss * 5: ss * 6]) / 5]
 
+
 def paste_blank_data(wb, worksheet, data):
 	ws = wb[worksheet]
 	i = 0
 	for row in ws.iter_rows(min_row=5, min_col=8, max_row=9, max_col=10):
 		for cell in row:
+			cell.value = data[i]
+			i += 1
+	for col in ws.iter_cols(min_row=5, min_col=11, max_row=9, max_col=11):
+		for cell in col:
 			cell.value = data[i]
 			i += 1
 	wb.save('empty_template.xlsx')
@@ -80,10 +85,15 @@ def paste_data(wb, worksheet, data, avg_list):
 				cell.value = data[i] - avg_list[j]
 			i += 1
 			j = j + 1 if j < 2 else 0
+	for col in ws.iter_cols(min_row=5, min_col=11, max_row=9, max_col=11):
+		for cell in col:
+			if data[i] - avg_list[3] < 0:
+				cell.value = data[i]
+			else:
+				cell.value = data[i] - avg_list[3]
+			i += 1
 	wb.save('empty_template.xlsx')
 
-
-# append 48h
 # returns list of averages
 def calc_avg(data):
 	lst = [0, 0, 0]
