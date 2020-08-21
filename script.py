@@ -1,14 +1,16 @@
 import os
 import pandas
 import shutil
+import sys
 from datetime import datetime
 from openpyxl import load_workbook
 
 
-def main(dirname):
-	df = pandas.read_excel(io="raw_data_1.xlsx", sheet_name='Data')
-
-	# parsing input data
+def main(dirname, raw_data1, raw_data2):
+	"""
+		parsing input data
+	"""
+	df = pandas.read_excel(io=raw_data1, sheet_name='Data')
 	d1_label = df.iloc[1, 2].split(' ')[0]
 	d1 = list(df.iloc[2:, 5])
 	d1s1, d1s2, d1s3, d1b1, d1b2, d1b3 = save_data(d1)
@@ -24,7 +26,7 @@ def main(dirname):
 	d2b3_avg_list = calc_avg(d2b3)
 
 	# from 48h sheet
-	df2 = pandas.read_excel(io="raw_data_2.xlsx", sheet_name='Data')
+	df2 = pandas.read_excel(io=raw_data2, sheet_name='Data')
 	d1_48 = list(df2.iloc[2:, 5])
 	save_48_data(
 		d1_48, d1s1, d1s2, d1s3, d1b1, d1b2, d1b3,
@@ -37,7 +39,9 @@ def main(dirname):
 		d2b1_avg_list, d2b2_avg_list, d2b3_avg_list
 	)
 
-	# write all data to 3 separate docs
+	"""
+		outputting data
+	"""
 	output_data(
 		'%s/output1.xlsx' % dirname, d1_label, d2_label, d1s1, d2s1, d1b1, d2b1,
 		d1b1_avg_list, d2b1_avg_list
@@ -140,16 +144,28 @@ def paste_data(wb, label, worksheet, data, avg_list):
 
 
 if __name__ == "__main__":
-	# raw_data1 = input('Enter the name of the 2-24h raw data file: ')
-	# raw_data2 = input('Enter the name of the 48h raw data file: ')
-	try:
-		dirname = datetime.today().strftime('%Y%m%d') + ' Analysis'
-		os.mkdir(dirname)
-		shutil.copy2('empty_template.xlsx', '%s/output1.xlsx' % dirname)
-		shutil.copy2('empty_template.xlsx', '%s/output2.xlsx' % dirname)
-		shutil.copy2('empty_template.xlsx', '%s/output3.xlsx' % dirname)
-	except:
-		print('Files exist. Appending files instead')
-		pass
+	print('\n  HI AVRO !!!!! \n')
 
-	main(dirname)
+	try:
+		dirname = input('Enter the name of the folder you want the outputted files to be in: ')
+		os.mkdir(dirname)
+		shutil.copy2('template.xlsx', '%s/output1.xlsx' % dirname)
+		shutil.copy2('template.xlsx', '%s/output2.xlsx' % dirname)
+		shutil.copy2('template.xlsx', '%s/output3.xlsx' % dirname)
+	except:
+		q = input('This folder exists. Append these files? (Y/N): ')
+		if q.lower() == 'y':
+			pass
+		if q.lower() == 'n':
+			print('\nOK well enter a different folder name then')
+			print('start over pls. self destructing ...\n')
+			sys.exit()
+
+	raw_data1 = input('Enter the name of the 2-24h raw data file: ') + '.xlsx'
+	raw_data2 = input('Enter the name of the 48h raw data file: ') + '.xlsx'
+
+	print('\n ~~~ working on it boss ~~~ \n')
+	main(dirname, raw_data1, raw_data2)
+
+	print('All done :) \n')
+	print('Your files are in the folder "' + dirname + '".')
