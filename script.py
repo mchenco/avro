@@ -2,7 +2,6 @@ import os
 import pandas
 import shutil
 import sys
-from datetime import datetime
 from openpyxl import load_workbook
 
 
